@@ -12,6 +12,9 @@ with open('COOKIE_KEY') as cookie:
     cookie.close()
 
 r = requests.get(url, headers={'Cookie': cookie_key})
-with open('day{}.in'.format(sys.argv[1]), "x") as f:
+if r.status_code != 200:
+    print("Input file is not yet available")
+    exit()
+with open('input/day{}.in'.format(sys.argv[1]), "x") as f:
     f.write(r.text)
     f.close()
