@@ -4,37 +4,41 @@ import Data.List
 main :: IO()
 main = do
   input <- readFile "input/day2.in"
-  print $ part1 input
-  print $ part2 input
+  print $ part1 $ parseInput input
+  print $ part2 $ parseInput input
 
 parseInput :: String -> [[String]]
 parseInput input = map words $ lines input
 
-part1 :: String -> Int
-part1 input = length $ filter (\b -> b) $ map checkRange $ parseInput input
+part1 :: [[String]] -> Int
+part1 input = length $ filter (\b -> b) $ map checkRange input
 
-part2 :: String -> Int
-part2 input = length $ filter (\b -> b) $ map checkPolicy $ parseInput input
+part2 :: [[String]] -> Int
+part2 input = length $ filter (\b -> b) $ map checkPolicy input
 
 checkRange :: [String] -> Bool
-checkRange (r:xs) = and [(fst $ getRange r) <= (getCount xs), (snd $ getRange r) >= (getCount xs)]
-checkRange _ = False
+checkRange p = (fst r) <= (getCount c s) && (snd r) >= (getCount c s)
+  where
+    policy = parsePolicy p
+    r = (\(r, _, _) -> r) policy
+    c = (\(_, c, _) -> c) policy
+    s = (\(_, _, s) -> s) policy
+    getCount c s = length $ filter (\x -> (x == c)) s
 
 checkPolicy :: [String] -> Bool
-checkPolicy (r:xs) = (i || j) && (not (i && j))
+checkPolicy p = (start || end) && (not (start && end))
   where
-    i = checkPolicyAt xs (fst $ getRange r)
-    j = checkPolicyAt xs (snd $ getRange r)
-checkPolicy _ = False
+    policy = parsePolicy p
+    r = (\(r, _, _) -> r) policy
+    c = (\(_, c, _) -> c) policy
+    s = (\(_, _, s) -> s) policy
+    start = (s !! (fst r - 1)) == c
+    end = (s !! (snd r - 1)) == c
 
-checkPolicyAt :: [String] -> Int -> Bool
-checkPolicyAt (c:s) i = (head c) == ((head s) !! (i-1))
-checkPolicyAt _ _ = False
+parsePolicy :: [String] -> ((Int, Int), Char, String)
+parsePolicy [r,c,s] = (getRange r, head c, s)
+parsePolicy _ = error "This hopefully shouldn't happen."
 
 getRange :: String -> (Int, Int)
 getRange s = (read (fst t) :: Int, read (drop 1 $ snd t) :: Int)
   where t = break (== '-') s
-
-getCount :: [String] -> Int
-getCount (c:s) = length $ filter (\x -> (x == (head c))) (head s)
-getCount _ = -1

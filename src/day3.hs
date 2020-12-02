@@ -3,10 +3,13 @@ import Data.List
 
 main :: IO()
 main = do
-  -- input <- readFile "input/day3.in"
-  print $ part1 input
-  print $ part2 input
-  where input = "Not yet available."
+  -- input <- readFile "input/dayX.in"
+  print $ part1 $ parseInput input
+  print $ part2 $ parseInput input
+    where input = "Not yet available"
+
+parseInput :: String -> String
+parseInput input = input
 
 part1 :: String -> String
 part1 _ = "Not yet implemented"

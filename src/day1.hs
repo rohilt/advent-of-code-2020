@@ -3,17 +3,17 @@ import System.IO
 main :: IO()
 main = do
   input <- readFile "input/day1.in"
-  print $ part1 input
-  print $ part2 input
+  print $ part1 $ parseInput input
+  print $ part2 $ parseInput input
 
 parseInput :: String -> [Int]
 parseInput input = map (\x -> read x :: Int) $ lines input
 
-part1 :: String -> Int
-part1 input = findProduct (parseInput input) [] 2
+part1 :: [Int] -> Int
+part1 input = findProduct input [] 2
 
-part2 :: String -> Int
-part2 input = findProduct (parseInput input) [] 3
+part2 :: [Int] -> Int
+part2 input = findProduct input [] 3
 
 findProduct :: [Int] -> [Int] -> Int -> Int
 findProduct [] selected s = if selectedWorks then (product selected) else 0
