@@ -19,10 +19,10 @@ parseInput input = map formatEntries $ splitEntries $ lines input
     formatEntries = Map.fromList . map ((\(i,j) -> (i, drop 1 j)) . break (==':')) . words . intercalate " "
 
 part1 :: [Passport] -> Int
-part1 passports = length $ filter validPassport passports
+part1 = length . filter validPassport
 
 part2 :: [Passport] -> Int
-part2 passports = length $ filter (\x -> and [validPassport x, validatePassport x]) passports
+part2 = length . filter (\x -> and [validPassport x, validatePassport x])
 
 validPassport :: Passport -> Bool
 validPassport p = and $ map passportContains ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
