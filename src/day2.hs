@@ -11,10 +11,10 @@ parseInput :: String -> [[String]]
 parseInput input = map words $ lines input
 
 part1 :: [[String]] -> Int
-part1 input = length $ filter (\b -> b) $ map checkRange input
+part1 = length . filter (\b -> b) . map checkRange
 
 part2 :: [[String]] -> Int
-part2 input = length $ filter (\b -> b) $ map checkPolicy input
+part2 = length . filter (\b -> b) . map checkPolicy
 
 checkRange :: [String] -> Bool
 checkRange p = (fst r) <= (getCount c s) && (snd r) >= (getCount c s)
