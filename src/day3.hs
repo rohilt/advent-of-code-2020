@@ -3,7 +3,7 @@ import Data.List
 
 main :: IO()
 main = do
-  input <- readFile "input/day3.in"
+  input <- readFile "../input/day3.in"
   print $ part1 $ parseInput input
   print $ part2 $ parseInput input
 

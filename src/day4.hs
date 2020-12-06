@@ -2,20 +2,19 @@ import System.IO
 import Data.List
 import Data.Maybe
 import qualified Data.Map as Map
+import Helper.Parse
 
 type Passport = Map.Map String String
 
 main :: IO()
 main = do
-  input <- readFile "input/day4.in"
+  input <- readFile "../input/day4.in"
   print $ part1 $ parseInput input
   print $ part2 $ parseInput input
 
 parseInput :: String -> [Passport]
-parseInput input = map formatEntries $ splitEntries $ lines input
+parseInput input = map formatEntries $ splitOn "" $ lines input
   where
-    splitEntries [] = []
-    splitEntries entries = (takeWhile (/= "") entries):(takeWhile (/= []) $ splitEntries (drop 1 $ dropWhile (/= "") entries))
     formatEntries = Map.fromList . map ((\(i,j) -> (i, drop 1 j)) . break (==':')) . words . intercalate " "
 
 part1 :: [Passport] -> Int
