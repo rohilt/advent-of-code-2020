@@ -25,7 +25,7 @@ part2 :: [Passport] -> Int
 part2 = length . filter (\x -> and [validPassport x, validatePassport x])
 
 validPassport :: Passport -> Bool
-validPassport p = and $ map passportContains ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+validPassport p = all passportContains ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
   where
     passportContains k = Map.member k p
 
