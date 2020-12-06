@@ -9,13 +9,13 @@ main = do
   print $ part2 $ parseInput input
 
 parseInput :: String -> [[String]]
-parseInput input = splitGroups $ lines input
+parseInput = splitGroups . lines 
   where
     splitGroups [] = []
     splitGroups entries = (takeWhile (/= "") entries):(takeWhile (/= []) $ splitGroups (drop 1 $ dropWhile (/= "") entries))
 
 part1 :: [[String]] -> Int
-part1 groups = sum $ map (length . (\(x:xs) -> foldr union x xs) ) groups
+part1 = sum . map (length . (\(x:xs) -> foldr union x xs) )
 
 part2 :: [[String]] -> Int
-part2 groups = sum $ map (length . (\(x:xs) -> foldr intersect x xs) ) groups
+part2 = sum . map (length . (\(x:xs) -> foldr intersect x xs) )
