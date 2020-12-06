@@ -9,7 +9,7 @@ main = do
 
 parseInput :: String -> [[Square]]
 parseInput input = map parseLine $ lines input
-  where parseLine line = map (\x -> if (x == '.') then Open else Tree) line
+  where parseLine = map (\x -> if (x == '.') then Open else Tree)
 
 part1 :: [[Square]] -> Int
 part1 grid = countTrees grid 3
