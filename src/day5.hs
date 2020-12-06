@@ -8,10 +8,10 @@ main = do
   print $ part2 $ parseInput input
 
 parseInput :: String -> [String]
-parseInput input = lines input
+parseInput = lines
 
 part1 :: [String] -> Int
-part1 seats = maximum $ map computeSeatNumber seats
+part1 = maximum . map computeSeatNumber
 
 part2 :: [String] -> Int
 part2 seats = head $ filter (\x -> (elem (x - 1) seatsFound) && (elem (x + 1) seatsFound)) seatsLeft
