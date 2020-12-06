@@ -1,6 +1,5 @@
 import System.IO
 import Data.List
-import qualified Data.Set as Set
 import Helper.Parse
 
 main :: IO()
