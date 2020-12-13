@@ -3,16 +3,19 @@ import Data.List
 
 main :: IO()
 main = do
-  -- input <- readFile "input/dayX.in"
+  input <- readFile "../input/day10.in"
   print $ part1 $ parseInput input
   print $ part2 $ parseInput input
-    where input = "Not yet available"
 
-parseInput :: String -> String
-parseInput input = input
+parseInput :: String -> [Int]
+parseInput = map read . lines
 
-part1 :: String -> String
-part1 _ = "Not yet implemented"
+part1 :: [Int] -> Int
+part1 joltages = ((+1) $ numOnes joltages) * ((+1) $ numThrees joltages)
+  where
+    differences joltages = [ (sort joltages !! (i+1)) - (sort joltages !! i) | i <- [0..length joltages - 2] ]
+    numOnes = length . filter (==1) . differences
+    numThrees = length . filter (==3) . differences
 
-part2 :: String -> String
+part2 :: [Int] -> String
 part2 _ = "Not yet implemented"
