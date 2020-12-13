@@ -15,9 +15,7 @@ part1 :: [Int] -> Int
 part1 = doesNotMatchProperty
 
 part2 :: [Int] -> Int
-part2 xs = matchSum xs doesNotMatchProperty'
-  where
-    doesNotMatchProperty' = doesNotMatchProperty xs
+part2 xs = matchSum xs $ doesNotMatchProperty xs
 
 doesNotMatchProperty :: [Int] -> Int
 doesNotMatchProperty xs = fromJust $ head $ filter isJust [if (elem (xs !! i) (prevSum i)) then Nothing else Just (xs !! i) | i <- [25..(length xs - 1)] ]
