@@ -15,7 +15,7 @@ part1 :: [Int] -> Int
 part1 = doesNotMatchProperty
 
 part2 :: [Int] -> Int
-part2 xs = fromJust $ matchSum xs doesNotMatchProperty' Nothing Nothing
+part2 xs = matchSum xs doesNotMatchProperty'
   where
     doesNotMatchProperty' = doesNotMatchProperty xs
 
@@ -24,16 +24,19 @@ doesNotMatchProperty xs = fromJust $ head $ filter isJust [if (elem (xs !! i) (p
   where
     prevSum i = [x + y | x <- take 25 $ drop (i-25) xs, y <- take 25 $ drop (i-25) xs]
 
-matchSum :: [Int] -> Int -> Maybe Int -> Maybe Int -> Maybe Int
-matchSum (x:xs) s Nothing Nothing
-  | x >= s = Nothing
-  | isJust $ matchSum xs (s-x) (Just x) (Just x) = matchSum xs (s-x) (Just x) (Just x)
-  | otherwise = matchSum xs s Nothing Nothing
-matchSum (x:xs) s (Just y1) (Just y2)
+matchSum :: [Int] -> Int -> Int
+matchSum (x:xs) s
+  | isJust $ matchSumStart xs (s-x) x x = fromJust $ matchSumStart xs (s-x) x x
+  | otherwise = matchSum xs s
+matchSum [] _ = error "This shouldn't happen"
+
+matchSumStart :: [Int] -> Int -> Int -> Int -> Maybe Int
+matchSumStart (x:xs) s y1 y2
+  | s < 0 = Nothing
   | x == s = Just (newMin + newMax)
   | x > s = Nothing
-  | x < s = matchSum xs (s-x) (Just newMin) (Just newMax)
+  | x < s = matchSumStart xs (s-x) newMin newMax
   where
     newMin = if y1 > x then x else y1
     newMax = if y2 < x then x else y2
-matchSum [] _ _ _ = Nothing
+matchSumStart [] _ _ _ = Nothing
