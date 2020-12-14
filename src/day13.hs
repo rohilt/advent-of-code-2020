@@ -27,5 +27,7 @@ part1 (minTime, busIds) = multiplyTuple $ head $ sortOn snd $ map (waitTime . fr
     waitTime busId = (busId, busId - (minTime `mod` busId))
     multiplyTuple (x, y) = x*y
 
-part2 :: Information -> String
-part2 _ = "Not yet implemented"
+part2 :: Information -> Int
+part2 (_, busIds) = head $ dropWhile (not . busesMeetCondition) [0..]
+  where
+    busesMeetCondition t = all (\x -> x) [ if isNothing (busIds !! i) then True else (mod (t+i) (fromJust $ busIds !! i) == 0) | i <- [0..(length busIds - 1)] ]
