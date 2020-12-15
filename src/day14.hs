@@ -3,9 +3,9 @@ import Data.List
 import qualified Data.Map as Map
 
 type Mask = [(Int, Bool)]
+type Memory = Map.Map Int Int
 data ProgramInstruction = SetMask Mask | SetMemory (Int, Int)
-  deriving (Show)
-type State = (Map.Map Int Int, Mask)
+type State = (Memory, Mask)
 
 main :: IO()
 main = do
@@ -28,8 +28,10 @@ part1 = sum . map snd . Map.toList . fst . finalState
   where
     finalState = foldl interpretInstruction (Map.empty, [])
 
-part2 :: [ProgramInstruction] -> String
-part2 _ = "Not yet implemented"
+part2 :: [ProgramInstruction] -> Int
+part2 = sum . map snd . Map.toList . fst . finalState
+  where
+    finalState = foldl interpretInstruction' (Map.empty, [])
 
 interpretInstruction :: State -> ProgramInstruction -> State
 interpretInstruction (memory, mask) (SetMask newMask) = (memory, newMask)
@@ -41,3 +43,14 @@ interpretInstruction (memory, mask) (SetMemory (addr, val)) = (Map.insert addr (
       | valueOfBit n i = n - (2 ^ i)
       | not $ valueOfBit n i = n + (2 ^ i)
     newValue val = foldl adjustBit val
+
+
+interpretInstruction' :: State -> ProgramInstruction -> State
+interpretInstruction' (memory, mask) (SetMask newMask) = (memory, newMask)
+interpretInstruction' (memory, mask) (SetMemory (addr, val)) = (foldl addToMemory memory memoryWrites, mask)
+  where
+    addrToWrite :: Int -> Mask -> [Int]
+    addrToWrite _ _ = [] --TODO
+    memoryWrites = zip (addrToWrite addr mask) (repeat val)
+    addToMemory :: Memory -> (Int, Int) -> Memory
+    addToMemory m (a,v) = Map.insert a v m
