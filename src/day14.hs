@@ -32,4 +32,12 @@ part2 :: [ProgramInstruction] -> String
 part2 _ = "Not yet implemented"
 
 interpretInstruction :: State -> ProgramInstruction -> State
-interpretInstruction s _ = s
+interpretInstruction (memory, mask) (SetMask newMask) = (memory, newMask)
+interpretInstruction (memory, mask) (SetMemory (addr, val)) = (Map.insert addr (newValue val mask) memory, mask)
+  where
+    valueOfBit num i = mod num (2 ^ (i+1)) >= (2 ^ i)
+    adjustBit n (i,b)
+      | valueOfBit n i == b = n
+      | valueOfBit n i = n - (2 ^ i)
+      | not $ valueOfBit n i = n + (2 ^ i)
+    newValue val = foldl adjustBit val
