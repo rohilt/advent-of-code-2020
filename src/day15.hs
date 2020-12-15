@@ -3,16 +3,20 @@ import Data.List
 
 main :: IO()
 main = do
-  -- input <- readFile "input/dayX.in"
+  input <- readFile "../input/day15.in"
   print $ part1 $ parseInput input
   print $ part2 $ parseInput input
-    where input = "Not yet available"
 
-parseInput :: String -> String
-parseInput input = input
+parseInput :: String -> [Int]
+parseInput = splitAtComma . init
 
-part1 :: String -> String
-part1 _ = "Not yet implemented"
+splitAtComma :: String -> [Int]
+splitAtComma input
+  | (not $ elem ',' input) = [read input]
+  | otherwise = (read $ takeWhile (/= ',') input):(splitAtComma $ tail $ dropWhile (/= ',') input)
 
-part2 :: String -> String
+part1 :: [Int] -> [Int]
+part1 i = i
+
+part2 :: [Int] -> String
 part2 _ = "Not yet implemented"
