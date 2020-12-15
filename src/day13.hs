@@ -28,6 +28,15 @@ part1 (minTime, busIds) = multiplyTuple $ head $ sortOn snd $ map (waitTime . fr
     multiplyTuple (x, y) = x*y
 
 part2 :: Information -> Int
-part2 (_, busIds) = head $ dropWhile (not . busesMeetCondition) [0..]
+part2 (_, busIds) = sieve $ formatBusIds busIds
   where
-    busesMeetCondition t = all (\x -> x) [ if isNothing (busIds !! i) then True else (mod (t+i) (fromJust $ busIds !! i) == 0) | i <- [0..(length busIds - 1)] ]
+    formatBusIds = reverse . fst . foldl formatBusId ([], 0)
+    formatBusId (x,i) y = if isNothing y then (x,i+1) else ((fromJust y, i):x, i+1)
+
+sieve :: [(Int, Int)] -> Int
+sieve ((i,s):(n,t):xs) = sieve ((i*n,ans):xs)
+  where
+    ans = head $ dropWhile (not . correctMod) $ [s,s+i..]
+    correctMod y = mod y n == mod (n-t) n
+sieve [(i,s)] = s
+sieve _ = error "This shouldn't happen"
