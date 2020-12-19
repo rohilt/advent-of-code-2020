@@ -40,7 +40,11 @@ part1 (rules, _, tickets) = sum $ map collectInvalidValues tickets
     collectInvalidValues [] = 0
 
 part2 :: Input -> Int
-part2 (rules, myTicket, tickets) = sum $ map ((!!) myTicket) $ findFields rules $ filter (isValidTicket rules) tickets
+part2 (rules, myTicket, tickets) = product $ map ((!!) myTicket) fieldsToPick
+  where
+    matchedFields = findFields rules $ filter (isValidTicket rules) tickets
+    departureFields = filter (snd . ((!!) rules) ) [0..(length rules - 1)]
+    fieldsToPick = map (\i -> fromJust $ findIndex (==i) matchedFields) departureFields
 
 isValidTicket :: [Field] -> Ticket -> Bool
 isValidTicket rules (x:xs) = (any (\f -> f x) (map fst rules)) && (isValidTicket rules xs)
