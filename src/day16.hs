@@ -1,9 +1,10 @@
 import System.IO
 import Data.List
 import Data.Char
+import Data.Maybe
 import Helper.Parse
 
-type Field = Int -> Bool
+type Field = (Int -> Bool, Bool)
 type Ticket = [Int]
 type Input = ([Field], Ticket, [Ticket])
 
@@ -21,12 +22,12 @@ parseInfo (r:m:t:[]) = (map parseRule r, splitNumsAtComma $ last m, map splitNum
 parseInfo _ = error "This shouldn't happen"
 
 parseRule :: String -> Field
-parseRule = parseRanges . words . dropWhile (not . isDigit)
+parseRule s = (parseRanges $ words $ dropWhile (not . isDigit) s, (== "departure") $ head $ words s)
 
-parseRanges :: [String] -> Field
+parseRanges :: [String] -> (Int -> Bool)
 parseRanges (a:"or":b:[]) = \i -> (parseRange a i) || (parseRange b i)
 
-parseRange :: String -> Field
+parseRange :: String -> (Int -> Bool)
 parseRange s = \i -> (i <= max) && (i >= min)
   where
     min = read $ takeWhile isDigit s
@@ -35,8 +36,32 @@ parseRange s = \i -> (i <= max) && (i >= min)
 part1 :: Input -> Int
 part1 (rules, _, tickets) = sum $ map collectInvalidValues tickets
   where
-    collectInvalidValues (x:xs) = (if (any (\f -> f x) rules) then 0 else x) + collectInvalidValues xs
+    collectInvalidValues (x:xs) = (if (any (\f -> f x) (map fst rules)) then 0 else x) + collectInvalidValues xs
     collectInvalidValues [] = 0
 
 part2 :: Input -> Int
-part2 _ = 0
+part2 (rules, myTicket, tickets) = sum $ map ((!!) myTicket) $ findFields rules $ filter (isValidTicket rules) tickets
+
+isValidTicket :: [Field] -> Ticket -> Bool
+isValidTicket rules (x:xs) = (any (\f -> f x) (map fst rules)) && (isValidTicket rules xs)
+isValidTicket _ [] = True
+
+findFields :: [Field] -> [Ticket] -> [Int]
+findFields rules tickets = simplifyFields $ foldl checkValidField start tickets
+  where
+    start = [ [0..(length rules - 1)] | i <- [0..(length rules - 1)] ]
+    checkValidField :: [[Int]] -> Ticket -> [[Int]]
+    checkValidField xs t = [ filter (\j -> (fst (rules !! j) (t !! i))) (xs !! i) | i <- [0..(length xs - 1)] ]
+
+simplifyFields :: [[Int]] -> [Int]
+simplifyFields fields = map fromJust $ simplifyFields' [ Nothing | i <- [0..(length fields - 1)] ] fields
+
+simplifyFields' :: [Maybe Int] -> [[Int]] -> [Maybe Int]
+simplifyFields' s i
+  | all ((==0) . length) i = s
+  | otherwise = simplifyFields' newS newI
+  where
+    matchedRule = fromJust $ findIndex ((==1) . length) i
+    matchedRuleValue = head $ i !! matchedRule
+    newS = (take matchedRule s) ++ [Just matchedRuleValue] ++ (drop (matchedRule+1) s)
+    newI = map (delete matchedRuleValue) i
