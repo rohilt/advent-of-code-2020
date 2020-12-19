@@ -1,6 +1,7 @@
 import System.IO
 import Data.List
 import qualified Data.Map as Map
+import Helper.Parse
 
 type GameMemory = Map.Map Int Int
 type Turn = (Int, Int, GameMemory)
@@ -12,12 +13,7 @@ main = do
   print $ part2 $ parseInput input
 
 parseInput :: String -> [Int]
-parseInput = splitAtComma . init
-
-splitAtComma :: String -> [Int]
-splitAtComma input
-  | (not $ elem ',' input) = [read input]
-  | otherwise = (read $ takeWhile (/= ',') input):(splitAtComma $ tail $ dropWhile (/= ',') input)
+parseInput = splitNumsAtComma . init
 
 part1 :: [Int] -> Int
 part1 = getNthNumber 2020
