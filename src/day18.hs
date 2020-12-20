@@ -4,7 +4,7 @@ import Data.Maybe
 import Data.Char
 
 data Token = Addition | Multiplication | LeftP | RightP | Number Int
-  deriving (Show,Eq)
+  deriving (Eq)
 type Expression = [Token]
 data StackFrame = SNumber Int | SFunction (Int -> Int)
 type Stack = [Maybe StackFrame]
@@ -30,15 +30,9 @@ parseInput' [] = []
 
 part1 :: [Expression] -> Int
 part1 = sum . map (interpretStackResult . head . foldl interpretExpression [Nothing])
-  where
-    interpretStackResult (Just (SNumber x)) = x
-    interpretStackResult _ = error "This shouldn't happen"
 
 part2 :: [Expression] -> Int
 part2 = sum . map (interpretStackResult . head . foldl interpretExpression [Nothing] . addAdditionPrecedence)
-  where
-    interpretStackResult (Just (SNumber x)) = x
-    interpretStackResult _ = error "This shouldn't happen"
 
 interpretExpression :: Stack -> Token -> Stack
 interpretExpression (Nothing:xs) (Number x) = ((Just (SNumber x)):xs)
@@ -60,6 +54,14 @@ addAdditionPrecedence' ((Number x):xs) = ((Number x):(addAdditionPrecedence' xs)
 addAdditionPrecedence' (Multiplication:xs) = (RightP:Multiplication:LeftP:(addAdditionPrecedence' xs))
 addAdditionPrecedence' (LeftP:xs) = (LeftP:(addAdditionPrecedence untilRightP)) ++ (addAdditionPrecedence' afterRightP)
   where
-    untilRightP = takeWhile (/= RightP) xs
-    afterRightP = dropWhile (/= RightP) xs
+    nestedParentheses curr LeftP = curr + 1
+    nestedParentheses curr RightP = curr - 1
+    nestedParentheses curr _ = curr
+    untilMatchingP = length $ takeWhile (>0) $ tail $ scanl nestedParentheses 1 xs
+    untilRightP = take untilMatchingP xs
+    afterRightP = drop untilMatchingP xs
 addAdditionPrecedence' (RightP:xs) = (RightP:(addAdditionPrecedence' xs))
+
+interpretStackResult :: Maybe StackFrame -> Int
+interpretStackResult (Just (SNumber x)) = x
+interpretStackResult _ = error "This shouldn't happen"
