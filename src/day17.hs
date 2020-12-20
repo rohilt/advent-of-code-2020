@@ -37,7 +37,7 @@ expandDimension x = tempDimensionExpansion ++ (map expandPlane x) ++ tempDimensi
 expandDimension' :: Dimension' -> Dimension'
 expandDimension' x = tempDimensionExpansion' ++ (map expandDimension x) ++ tempDimensionExpansion'
   where
-    tempDimensionExpansion' = [replicate (length (head x) + 1) (replicate (length (head (head x)) + 2) (replicate (length (head (head (head (x)))) + 2) Inactive))]
+    tempDimensionExpansion' = [replicate (length (head x) + 2) (replicate (length (head (head x)) + 2) (replicate (length (head (head (head (x)))) + 2) Inactive))]
 
 dimensionCycle :: Dimension -> Dimension
 dimensionCycle d = [ [ [ newValue (i,j,k) | i <- [0..columnI] ] | j <- [0..rowI] ] | k <- [0..planeI] ]
