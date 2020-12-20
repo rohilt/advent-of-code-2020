@@ -1,5 +1,6 @@
 import System.IO
 import Data.List
+import Data.Maybe
 import Data.Char
 import qualified Data.Map as Map
 import Helper.Parse
@@ -29,10 +30,20 @@ parseRule m s
     finalMap r = Map.insert ruleNum r m
 
 part1 :: Input -> Int
-part1 (rules, msgs) = length $ filter (matchesRule rules 0) msgs
+part1 (rules, msgs) = length $ filter (\m -> hasSolution $ matchesRule rules m 0) $ map (\m -> [Just m]) msgs
+  where
+    hasSolution = (> 0) . length . filter (== (Just ""))
 
 part2 :: Input -> String
 part2 _ = "Not yet implemented"
 
-matchesRule :: RuleMap -> Int -> String -> Bool
-matchesRule _ _ _ = True
+matchesRule :: RuleMap -> [Maybe String] -> Int -> [Maybe String]
+matchesRule _ [] _ = []
+matchesRule m (Nothing:ys) i = (Nothing:ys')
+  where
+    ys' = matchesRule m ys i
+matchesRule m ((Just (x:xs)):ys) i =
+  case (m Map.! i) of (C c) -> if (x == c) then (Just xs:ys') else (Nothing:ys')
+                      (R subrules) -> (concat $ map (foldl (matchesRule m) [Just (x:xs)]) subrules) ++ ys'
+  where
+    ys' = matchesRule m ys i
