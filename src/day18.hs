@@ -4,7 +4,7 @@ import Data.Maybe
 import Data.Char
 
 data Token = Addition | Multiplication | LeftP | RightP | Number Int
-  deriving (Show)
+  deriving (Show,Eq)
 type Expression = [Token]
 data StackFrame = SNumber Int | SFunction (Int -> Int)
 type Stack = [Maybe StackFrame]
@@ -35,7 +35,10 @@ part1 = sum . map (interpretStackResult . head . foldl interpretExpression [Noth
     interpretStackResult _ = error "This shouldn't happen"
 
 part2 :: [Expression] -> Int
-part2 _ = 0
+part2 = sum . map (interpretStackResult . head . foldl interpretExpression [Nothing] . addAdditionPrecedence)
+  where
+    interpretStackResult (Just (SNumber x)) = x
+    interpretStackResult _ = error "This shouldn't happen"
 
 interpretExpression :: Stack -> Token -> Stack
 interpretExpression (Nothing:xs) (Number x) = ((Just (SNumber x)):xs)
@@ -45,3 +48,18 @@ interpretExpression ((Just (SFunction f)):xs) (Number x) = ((Just (SNumber (f x)
 interpretExpression xs LeftP = (Nothing:xs)
 interpretExpression ((Just (SNumber x)):Nothing:xs) RightP = ((Just (SNumber x)):xs)
 interpretExpression ((Just (SNumber x)):(Just (SFunction f)):xs) RightP = ((Just (SNumber (f x))):xs)
+
+addAdditionPrecedence :: Expression -> Expression
+addAdditionPrecedence [] = []
+addAdditionPrecedence x = (LeftP:(addAdditionPrecedence' x)) ++ [RightP]
+
+addAdditionPrecedence' :: Expression -> Expression
+addAdditionPrecedence' [] = []
+addAdditionPrecedence' (Addition:xs) = (Addition:(addAdditionPrecedence' xs))
+addAdditionPrecedence' ((Number x):xs) = ((Number x):(addAdditionPrecedence' xs))
+addAdditionPrecedence' (Multiplication:xs) = (RightP:Multiplication:LeftP:(addAdditionPrecedence' xs))
+addAdditionPrecedence' (LeftP:xs) = (LeftP:(addAdditionPrecedence untilRightP)) ++ (addAdditionPrecedence' afterRightP)
+  where
+    untilRightP = takeWhile (/= RightP) xs
+    afterRightP = dropWhile (/= RightP) xs
+addAdditionPrecedence' (RightP:xs) = (RightP:(addAdditionPrecedence' xs))
