@@ -1,6 +1,7 @@
 import System.IO
 import Data.List
 import Helper.Parse
+import qualified Data.Set as Set
 
 type CardDeck = [Int]
 type Input = (CardDeck, CardDeck)
@@ -27,6 +28,11 @@ playRound ((x:xs), (y:ys))
   | x > y = (xs ++ [x,y], ys)
   | x < y = (xs, ys ++ [y,x])
   | otherwise = error "This shouldn't happen"
+playRound x = x
+
+playRecursiveRound :: (Input, Set.Set Input) -> Int
+playRecursiveRound (((x:xs), (y:ys)), prev)
+  | Set.member ((x:xs), (y:ys)) prev = getScore (x:xs)
 
 winningDeck :: Input -> CardDeck
 winningDeck = takeWinningDeck . head . dropWhile (\(x,y) -> x /= [] && y /= []) . iterate playRound
