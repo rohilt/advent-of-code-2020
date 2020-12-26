@@ -44,7 +44,7 @@ simplifyMap (m, is, done)
   | otherwise = (newM, (knownAllergen':is), False)
   where
     knownAllergen = map (\(a, i) -> (a, head i)) $ filter ((== 1) . length . snd) m
-    knownAllergen' = if knownAllergen /= [] then head knownAllergen else ("", "")
+    knownAllergen' = head knownAllergen
     newM = map (\(a, is') -> (a, filter (/= (snd knownAllergen')) is')) m
 
 listAllergens :: [Food] -> [Allergen]
