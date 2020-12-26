@@ -25,14 +25,14 @@ part1 foods = foldl countSafeIngredients 0 $ map fst foods
     is = getPotentialAllergenIngredients foods
     countSafeIngredients x y = x + (length $ filter (\x -> not $ elem x is) y)
 
-part2 :: [Food] -> Int
-part2 _ = 0
+part2 :: [Food] -> String
+part2 = intercalate "," . map snd . sortOn fst . (\(_, ais, _) -> ais) . getLastSimplifiedMap
 
 getPotentialAllergenIngredients :: [Food] -> [Ingredient]
-getPotentialAllergenIngredients = formatOutput . getLastSimplification . getAllergenToIngredientsMap
-  where
-    getLastSimplification = head . dropWhile (\(_, _, d) -> not d) . iterate simplifyMap . (\m -> (m, [], False))
-    formatOutput (m, r, _) = (map snd r) ++ (concat $ map snd m)
+getPotentialAllergenIngredients = (\(m, r, _) -> (map snd r) ++ (concat $ map snd m) ) . getLastSimplifiedMap
+
+getLastSimplifiedMap :: [Food] -> (AllergenIngredientMap, [(Allergen, Ingredient)], Bool)
+getLastSimplifiedMap = head . dropWhile (\(_, _, d) -> not d) . iterate simplifyMap . (\m -> (m, [], False)) . getAllergenToIngredientsMap
 
 getAllergenToIngredientsMap :: [Food] -> AllergenIngredientMap
 getAllergenToIngredientsMap foods = map (\a -> (a, listPotentialIngredients a foods)) $ listAllergens foods
