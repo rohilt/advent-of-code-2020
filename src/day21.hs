@@ -32,20 +32,20 @@ getPotentialAllergenIngredients :: [Food] -> [Ingredient]
 getPotentialAllergenIngredients = formatOutput . getLastSimplification . getAllergenToIngredientsMap
   where
     getLastSimplification = head . dropWhile (\(_, _, d) -> not d) . iterate simplifyMap . (\m -> (m, [], False))
-    formatOutput (m, r, _) = r ++ (concat $ map snd m)
+    formatOutput (m, r, _) = (map snd r) ++ (concat $ map snd m)
 
 getAllergenToIngredientsMap :: [Food] -> AllergenIngredientMap
 getAllergenToIngredientsMap foods = map (\a -> (a, listPotentialIngredients a foods)) $ listAllergens foods
 
-simplifyMap :: (AllergenIngredientMap, [Ingredient], Bool) -> (AllergenIngredientMap, [Ingredient], Bool)
+simplifyMap :: (AllergenIngredientMap, [(Allergen, Ingredient)], Bool) -> (AllergenIngredientMap, [(Allergen, Ingredient)], Bool)
 simplifyMap (m, is, done)
   | done = (m, is, True)
   | knownAllergen == [] = (m, is, True)
   | otherwise = (newM, (knownAllergen':is), False)
   where
     knownAllergen = map (\(a, i) -> (a, head i)) $ filter ((== 1) . length . snd) m
-    knownAllergen' = if knownAllergen /= [] then snd $ head knownAllergen else ""
-    newM = map (\(a, is') -> (a, filter (/= knownAllergen') is')) m
+    knownAllergen' = if knownAllergen /= [] then head knownAllergen else ("", "")
+    newM = map (\(a, is') -> (a, filter (/= (snd knownAllergen')) is')) m
 
 listAllergens :: [Food] -> [Allergen]
 listAllergens = union' . map snd
